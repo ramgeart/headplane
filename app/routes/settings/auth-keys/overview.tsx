@@ -1,5 +1,5 @@
 import { FileKey2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { Link as RemixLink } from "react-router";
 
 import Code from "~/components/Code";
@@ -15,6 +15,10 @@ import type { Route } from "./+types/overview";
 import { authKeysAction } from "./actions";
 import AuthKeyRow from "./auth-key-row";
 import AddAuthKey from "./dialogs/add-auth-key";
+
+function userLabel(user: { id: string; name?: string; displayName?: string; email?: string }) {
+  return user.name || user.displayName || user.email || user.id;
+}
 
 export async function loader({ request, context }: Route.LoaderArgs) {
   const session = await context.sessions.auth(request);
@@ -33,7 +37,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
             preAuthKeys,
           };
         } catch (error) {
-          log.error("api", "GET /v1/preauthkey for %s: %o", user.name, error);
+          log.error("api", "GET /v1/preauthkey for %s: %o", userLabel(user), error);
           return {
             success: false,
             user,
@@ -146,10 +150,10 @@ export default function Page({
         <Notice title="Missing authentication keys" variant="error">
           An error occurred while fetching the authentication keys for the following users:{" "}
           {missing.map(({ user }, index) => (
-            <>
-              <Code key={user.name}>{user.name}</Code>
+            <Fragment key={user.id}>
+              <Code>{userLabel(user)}</Code>
               {index < missing.length - 1 ? ", " : ". "}
-            </>
+            </Fragment>
           ))}
           Their keys may not be listed correctly. Please check the server logs for more information.
         </Notice>

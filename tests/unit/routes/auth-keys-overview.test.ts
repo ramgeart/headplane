@@ -25,7 +25,7 @@ describe('Pre-auth key overview loader', () => {
 			},
 		]);
 
-		const result = await loader({
+		const args: Parameters<typeof loader>[0] = {
 			request: new Request('http://localhost/admin/settings/auth-keys'),
 			context: {
 				sessions: {
@@ -45,7 +45,8 @@ describe('Pre-auth key overview loader', () => {
 					},
 				},
 			},
-		} as never);
+		} as Parameters<typeof loader>[0];
+		const result = await loader(args);
 
 		expect(getPreAuthKeys).toHaveBeenCalledWith('user-id');
 		expect(result.keys).toHaveLength(1);
